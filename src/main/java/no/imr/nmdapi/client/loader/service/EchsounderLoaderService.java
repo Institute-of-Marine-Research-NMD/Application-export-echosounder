@@ -183,9 +183,9 @@ public class EchsounderLoaderService {
                 SaType satype = new SaType();
                 satype.setCh(sabyaco.getCh());
                 satype.setValue(sabyaco.getSa());
-                if (sabyaco.getChType().equals("B")) {
+                if ("B".equals(sabyaco.getChType())) {
                     acousticcateogoryBottom.getSa().add(satype);
-                } else if (sabyaco.getChType().equals("P")) {
+                } else if ("P".equals(sabyaco.getChType())) {
                     acousticcateogoryPelagic.getSa().add(satype);
                 }
             }
@@ -202,7 +202,6 @@ public class EchsounderLoaderService {
 
     private void sortAcousticCategories(ChTypeType channelTypeType) {
         Collections.sort(channelTypeType.getSaByAcocat(), new Comparator<SaByAcocatType>() {
-
             @Override
             public int compare(SaByAcocatType o1, SaByAcocatType o2) {
                 Integer o1Val = Integer.valueOf(o1.getAcocat().toString().substring(0, 1));
