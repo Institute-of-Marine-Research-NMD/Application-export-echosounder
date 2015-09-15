@@ -8,6 +8,7 @@ import no.imr.nmdapi.client.loader.pojo.Frequency;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
+ * maps frequencies from the database to Frequency objects
  *
  * @author sjurl
  */

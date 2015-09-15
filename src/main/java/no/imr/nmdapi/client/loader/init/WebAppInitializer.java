@@ -11,6 +11,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.servlet.support.AbstractDispatcherServletInitializer;
 
 /**
+ * Initializes the web application
  *
  * @author sjurl
  */
@@ -35,7 +36,7 @@ public class WebAppInitializer extends AbstractDispatcherServletInitializer {
     @Override
     protected WebApplicationContext createRootApplicationContext() {
         AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
-        
+
         ctx.scan("no.imr.nmdapi.client.loader.config", "no.imr.nmdapi.client.loader.service");
         return ctx;
     }

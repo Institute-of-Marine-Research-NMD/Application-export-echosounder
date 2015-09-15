@@ -19,7 +19,7 @@
         <repository>
             <id>nexus-release</id>
             <name>Nexus release repository for IMR</name>
-            <url>http://javadev.imr.no:8081/nexus/content/repositories/releases/</url>
+            <url>https://build.imr.no/nexus/content/repositories/releases</url>
         </repository>
         <repository>
             <id>repository.springsource.milestone</id>
@@ -100,6 +100,11 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>9.4-1202-jdbc4</version>
+        </dependency>
+        <dependency>
+            <groupId>no.imr.nmdapi.lib</groupId>
+            <artifactId>PathGenerator</artifactId>
+            <version>0.0.2</version>
         </dependency>
     </dependencies>
 
@@ -290,6 +295,19 @@
             </build>
         </profile>
     </profiles>
+    
+    <scm>
+        <connection>scm:git:git@github.com:Institute-of-Marine-Research-NMD/Application-export-echosounder.git</connection>
+        <url>scm:git:git@github.com:Institute-of-Marine-Research-NMD/Application-export-echosounder.git</url>
+        <developerConnection>scm:git:git@github.com:Institute-of-Marine-Research-NMD/Application-export-echosounder.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <url>https://build.imr.no/nexus/content/repositories/releases</url>
+        </repository>
+    </distributionManagement>
 </project>
 
 

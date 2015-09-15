@@ -12,6 +12,7 @@ import no.imr.nmdapi.client.loader.pojo.EchosounderDataset;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
+ * Maps echosounder datasets from the database to EchosounderDataset objects
  *
  * @author sjurl
  */
@@ -25,6 +26,9 @@ public class EchosounderDatasetMapper implements RowMapper<EchosounderDataset> {
         type.setLsssVersion(rs.getString("lsss_version"));
         type.setNationioc(BigInteger.valueOf(rs.getInt("nationioc")));
         type.setPlatform(BigInteger.valueOf(rs.getInt("platform")));
+        type.setMissionType(rs.getString("description"));
+        type.setStartYear(String.valueOf(rs.getInt("startyear")));
+        type.setMissionId(rs.getString("missionid"));
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:SS");
         Timestamp repordate = rs.getTimestamp("report_time");
 

@@ -7,6 +7,7 @@ import no.imr.nmdapi.generic.nmdechosounder.domain.luf20.AcocatType;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
+ * Maps acoustic categories to AcocatType objects
  *
  * @author sjurl
  */

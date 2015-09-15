@@ -8,6 +8,7 @@ import no.imr.nmdapi.client.loader.pojo.Sa;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
+ * Maps SA objects from the database to Sa objects
  *
  * @author sjurl
  */

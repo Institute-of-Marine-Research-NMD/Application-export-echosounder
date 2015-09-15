@@ -14,6 +14,9 @@ public class EchosounderDataset {
     private BigInteger nationioc;
     private BigInteger platform;
     private String reportTime;
+    private String startYear;
+    private String missionType;
+    private String missionId;
 
     /**
      * @return the id
@@ -97,5 +100,47 @@ public class EchosounderDataset {
      */
     public void setReportTime(String reportTime) {
         this.reportTime = reportTime;
+    }
+
+    /**
+     * @return the missionType
+     */
+    public String getMissionType() {
+        return missionType;
+    }
+
+    /**
+     * @param missionType the missionType to set
+     */
+    public void setMissionType(String missionType) {
+        this.missionType = missionType;
+    }
+
+    /**
+     * @return the startYear
+     */
+    public String getStartYear() {
+        return startYear;
+    }
+
+    /**
+     * @param startYear the startYear to set
+     */
+    public void setStartYear(String startYear) {
+        this.startYear = startYear;
+    }
+
+    /**
+     * @return the missionId
+     */
+    public String getMissionId() {
+        return missionId;
+    }
+
+    /**
+     * @param missionId the missionId to set
+     */
+    public void setMissionId(String missionId) {
+        this.missionId = missionId;
     }
 }

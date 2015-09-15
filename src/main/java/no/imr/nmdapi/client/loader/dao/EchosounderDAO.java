@@ -1,18 +1,21 @@
 package no.imr.nmdapi.client.loader.dao;
 
-import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.sql.DataSource;
 import no.imr.nmdapi.client.loader.mapper.AcousticCategoryTypeMapper;
 import no.imr.nmdapi.client.loader.mapper.DistanceMapper;
 import no.imr.nmdapi.client.loader.mapper.EchosounderDatasetMapper;
 import no.imr.nmdapi.client.loader.mapper.FrequencyMapper;
 import no.imr.nmdapi.client.loader.mapper.SaMapper;
+import no.imr.nmdapi.client.loader.mapper.TypeValueMapper;
 import no.imr.nmdapi.client.loader.pojo.Distance;
 import no.imr.nmdapi.client.loader.pojo.EchosounderDataset;
 import no.imr.nmdapi.client.loader.pojo.Frequency;
 import no.imr.nmdapi.client.loader.pojo.Sa;
 import no.imr.nmdapi.generic.nmdechosounder.domain.luf20.AcocatType;
+import no.imr.nmdapi.lib.nmdapipathgenerator.TypeValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -30,13 +33,14 @@ public class EchosounderDAO {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    private static final String GET_ECHOSOUNDER_DATASET = "select ed.id, ed.report_time, ed.lsss_version, cm.cruisecode, na.nationioc, pl.platform "
-            + "from nmdechosounder.echosounder_dataset ed, nmdmission.cruisemission cm, "
+    private static final String GET_ECHOSOUNDER_DATASET = "select ed.id, ed.report_time, ed.lsss_version, cm.cruisecode, na.nationioc, pl.platform, mt.description, mi.startyear, mi.id as missionid "
+            + "from nmdechosounder.echosounder_dataset ed, nmdmission.cruisemission cm, nmdreference.missiontype mt, "
             + "nmdmission.mission mi, nmdreference.platform pl, "
             + "nmdreference.nation na "
             + "Where "
             + "ed.id_m_mission = mi.id and cm.id_mission = mi.id "
-            + "and mi.id_r_platform = pl.id and pl.id_nation = na.id";
+            + "and mi.id_r_platform = pl.id and pl.id_nation = na.id "
+            + "and mi.id_r_missiontype = mt.id";
 
     private static final String GET_DISTANCE_LIST_FOR_DATASET = "select id, bot_ch_thickness, include_estimate, integrator_dist, lat_start, lat_stop, lon_start, lon_stop, pel_ch_thickness, start_time, stop_time, log_start "
             + "from nmdechosounder.distance where id_echosounder_dataset = ? order by start_time";
@@ -49,6 +53,17 @@ public class EchosounderDAO {
             + "nmdechosounder.purpose p, nmdreference.acousticcategory a "
             + "where p.id_acoustic_category = a.id and "
             + "p.id_echosounder_dataset = ?";
+
+    private static final String platformCodesAfterStartQuery = " select platformcode , "
+            + "pcs.platformcodesysname as platformcodesysname  "
+            + "from nmdreference.platformcode pc,"
+            + " nmdreference.platformcodesys pcs,"
+            + " nmdmission.mission m "
+            + " where pc.id_platformcodesys = pcs.id"
+            + " and  pc.id_platform = m.id_r_platform"
+            + " and m.id = ? "
+            + " and m.start_time > pc.firstvaliddate  "
+            + " order by   pc.firstvaliddate ";
 
     /**
      * Returns a list of acoustic categories
@@ -71,11 +86,19 @@ public class EchosounderDAO {
         return jdbcTemplate.query(GET_SA_FOR_FREQUENCY, new SaMapper(), id);
     }
 
-//
-//    public Date getLastChanged() {
-//        return (Date) jdbcTemplate.query("SELECT max(last_edited) as last_edited FROM nmdreference.acousticcategory", new DateMapper()).get(0);
-//    }
     public List<AcocatType> getAcousticCategory(String datasetId) {
         return jdbcTemplate.query(GET_ACOUSTIC_CATEGORY, new AcousticCategoryTypeMapper(), datasetId);
     }
+
+    public Map<String, TypeValue> getCruisePlatformAfterStart(String missionID) {
+        Map<String, TypeValue> result = new HashMap<String, TypeValue>();
+
+        List platformList = jdbcTemplate.query(platformCodesAfterStartQuery, new TypeValueMapper("platformcodesysname", "platformcode"), missionID);
+        for (Object platform : platformList) {
+            result.put(((TypeValue) platform).getType(), ((TypeValue) platform));
+        }
+
+        return result;
+    }
+
 }

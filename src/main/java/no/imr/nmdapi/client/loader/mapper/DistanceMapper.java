@@ -14,6 +14,7 @@ import no.imr.nmdapi.client.loader.pojo.Distance;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
+ * Maps distances from the database to Distance objects
  *
  * @author sjurl
  */
@@ -40,7 +41,6 @@ public class DistanceMapper implements RowMapper<Distance> {
         } else {
             dist.setLatStop(BigDecimal.valueOf(rs.getDouble("lat_stop")).toPlainString());
         }
-//        dist.setLatStop(BigDecimal.valueOf(rs.getDouble("lat_stop")).toPlainString());
         dist.setLonStart(BigDecimal.valueOf(rs.getDouble("lon_start")));
 
         BigDecimal lonstop = rs.getBigDecimal("lon_stop");
@@ -49,7 +49,6 @@ public class DistanceMapper implements RowMapper<Distance> {
         } else {
             dist.setLonStop(BigDecimal.valueOf(rs.getDouble("lon_stop")).toPlainString());
         }
-//        dist.setLonStop(BigDecimal.valueOf(rs.getDouble("lon_stop")).toPlainString());
         dist.setPelChThickness(BigDecimal.valueOf(rs.getDouble("pel_ch_thickness")));
         dist.setLogStart(BigDecimal.valueOf(rs.getDouble("log_start")));
         Calendar tzCal = Calendar.getInstance(TimeZone.getTimeZone("GMT"));

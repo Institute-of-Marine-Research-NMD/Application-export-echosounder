@@ -26,12 +26,15 @@ import no.imr.nmdapi.generic.nmdechosounder.domain.luf20.EchosounderDatasetType;
 import no.imr.nmdapi.generic.nmdechosounder.domain.luf20.FrequencyType;
 import no.imr.nmdapi.generic.nmdechosounder.domain.luf20.SaByAcocatType;
 import no.imr.nmdapi.generic.nmdechosounder.domain.luf20.SaType;
+import no.imr.nmdapi.lib.nmdapipathgenerator.PathGenerator;
+import no.imr.nmdapi.lib.nmdapipathgenerator.TypeValue;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
+ * Service that loads echosounder dataset from the database into xml files
  *
  * @author sjurl
  */
@@ -47,19 +50,18 @@ public class EchsounderLoaderService {
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(EchsounderLoaderService.class);
 
     public void loadEchosounderToFile() {
-//        int i = 0;
 
         List<EchosounderDataset> echosounderDatasets = dao.getEchosounderDatasets();
         for (EchosounderDataset echosounderDataset : echosounderDatasets) {
 
             EchosounderDatasetType datasetType = generateEchosounderDatasetType(echosounderDataset);
 
-            writeToFile(datasetType, new File(config.getString("file.location").concat(datasetType.getCruise().toString()).concat(".xml")));
+            PathGenerator pathGenerator = new PathGenerator();
+            Map<String, TypeValue> typevalues = dao.getCruisePlatformAfterStart(echosounderDataset.getMissionId());
+            String platformPath = pathGenerator.createPlatformURICode(typevalues);
+            File outputFile = pathGenerator.generatePath(config.getString("file.location"), echosounderDataset.getMissionType(), echosounderDataset.getStartYear(), platformPath, echosounderDataset.getCruisecode().toString(), "echosounder");
+            writeToFile(datasetType, outputFile);
             LOGGER.info("Wrote file: " + datasetType.getCruise().toString());
-//            i++;
-//            if (i > 2) {
-//                break;
-//            }
         }
         LOGGER.info("Finished");
     }
@@ -213,12 +215,6 @@ public class EchsounderLoaderService {
                         return -1;
                     }
                 }
-
-//                if (o1.getAcocat().intValue() > o2.getAcocat().intValue()) {
-//                    return 1;
-//                } else if (o1.getAcocat().intValue() < o2.getAcocat().intValue()) {
-//                    return -1;
-//                }
                 return 0;
             }
         });
@@ -229,21 +225,6 @@ public class EchsounderLoaderService {
 
             @Override
             public int compare(SaType o1, SaType o2) {
-//                Integer o1Val = Integer.valueOf(o1.getCh().toString().substring(0, 1));
-//                Integer o2Val = Integer.valueOf(o2.getCh().toString().substring(0, 1));
-//
-//                if (o1Val > o2Val) {
-//                    return 1;
-//                } else if (o1Val < o2Val) {
-//                    return -1;
-//                } else {
-//                    if (o1.getCh().intValue() > o2.getCh().intValue()) {
-//                        return 1;
-//                    } else if (o1.getCh().intValue() < o2.getCh().intValue()) {
-//                        return -1;
-//                    }
-//                }
-
                 if (o1.getCh().intValue() > o2.getCh().intValue()) {
                     return 1;
                 } else if (o1.getCh().intValue() < o2.getCh().intValue()) {
