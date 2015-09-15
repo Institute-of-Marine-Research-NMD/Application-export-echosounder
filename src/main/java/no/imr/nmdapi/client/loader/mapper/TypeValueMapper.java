@@ -21,6 +21,15 @@ public class TypeValueMapper implements RowMapper<TypeValue> {
         this.valueName = valueName;
     }
 
+    /**
+     * Maps a resultset to a TypeValue object using typename for setType and
+     * valueName for setValue
+     *
+     * @param rs
+     * @param rowNum
+     * @return
+     * @throws SQLException
+     */
     @Override
     public TypeValue mapRow(ResultSet rs, int rowNum) throws SQLException {
         TypeValue platform = new TypeValue();
