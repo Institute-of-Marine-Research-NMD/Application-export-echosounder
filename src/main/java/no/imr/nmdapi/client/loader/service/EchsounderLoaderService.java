@@ -161,6 +161,18 @@ public class EchsounderLoaderService {
             }
         }
 
+        addSAToCorrectAcousticCategory(categories, bottomType, pelagictype);
+        sortAcousticCategories(pelagictype);
+        sortAcousticCategories(bottomType);
+        if (!pelagictype.getSaByAcocat().isEmpty()) {
+            freqType.getChType().add(pelagictype);
+        }
+        if (!bottomType.getSaByAcocat().isEmpty()) {
+            freqType.getChType().add(bottomType);
+        }
+    }
+
+    private void addSAToCorrectAcousticCategory(Map<BigInteger, List<Sa>> categories, ChTypeType bottomType, ChTypeType pelagictype) {
         for (BigInteger acocat : categories.keySet()) {
             SaByAcocatType acousticcateogoryPelagic = new SaByAcocatType();
             acousticcateogoryPelagic.setAcocat(acocat);
@@ -171,13 +183,10 @@ public class EchsounderLoaderService {
                 SaType satype = new SaType();
                 satype.setCh(sabyaco.getCh());
                 satype.setValue(sabyaco.getSa());
-                switch (sabyaco.getChType()) {
-                    case "B":
-                        acousticcateogoryBottom.getSa().add(satype);
-                        break;
-                    case "P":
-                        acousticcateogoryPelagic.getSa().add(satype);
-                        break;
+                if (sabyaco.getChType().equals("B")) {
+                    acousticcateogoryBottom.getSa().add(satype);
+                } else if (sabyaco.getChType().equals("P")) {
+                    acousticcateogoryPelagic.getSa().add(satype);
                 }
             }
             if (!acousticcateogoryBottom.getSa().isEmpty()) {
@@ -188,14 +197,6 @@ public class EchsounderLoaderService {
                 sortSA(acousticcateogoryPelagic);
                 pelagictype.getSaByAcocat().add(acousticcateogoryPelagic);
             }
-        }
-        sortAcousticCategories(pelagictype);
-        sortAcousticCategories(bottomType);
-        if (!pelagictype.getSaByAcocat().isEmpty()) {
-            freqType.getChType().add(pelagictype);
-        }
-        if (!bottomType.getSaByAcocat().isEmpty()) {
-            freqType.getChType().add(bottomType);
         }
     }
 
