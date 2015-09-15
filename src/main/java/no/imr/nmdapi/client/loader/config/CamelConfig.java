@@ -27,6 +27,7 @@ public class CamelConfig extends SingleRouteCamelConfiguration implements Initia
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        // Do nothing as we don't set any properties
     }
 
 }
