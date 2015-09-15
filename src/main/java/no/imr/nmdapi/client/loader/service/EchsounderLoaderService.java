@@ -84,7 +84,7 @@ public class EchsounderLoaderService {
             public int compare(AcocatType o1, AcocatType o2) {
                 if (o1.getAcocat().intValue() > o2.getAcocat().intValue()) {
                     return 1;
-                } else if (o1.getAcocat().intValue() > o2.getAcocat().intValue()) {
+                } else if (o1.getAcocat().intValue() < o2.getAcocat().intValue()) {
                     return -1;
                 }
                 return 0;
