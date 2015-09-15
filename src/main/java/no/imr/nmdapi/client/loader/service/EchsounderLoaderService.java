@@ -49,6 +49,9 @@ public class EchsounderLoaderService {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(EchsounderLoaderService.class);
 
+    /**
+     * Loads all echosounder datasets into xml files
+     */
     public void loadEchosounderToFile() {
 
         List<EchosounderDataset> echosounderDatasets = dao.getEchosounderDatasets();
@@ -177,21 +180,21 @@ public class EchsounderLoaderService {
                         break;
                 }
             }
-            if (acousticcateogoryBottom.getSa().size() > 0) {
+            if (!acousticcateogoryBottom.getSa().isEmpty()) {
                 sortSA(acousticcateogoryBottom);
                 bottomType.getSaByAcocat().add(acousticcateogoryBottom);
             }
-            if (acousticcateogoryPelagic.getSa().size() > 0) {
+            if (!acousticcateogoryPelagic.getSa().isEmpty()) {
                 sortSA(acousticcateogoryPelagic);
                 pelagictype.getSaByAcocat().add(acousticcateogoryPelagic);
             }
         }
         sortAcousticCategories(pelagictype);
         sortAcousticCategories(bottomType);
-        if (pelagictype.getSaByAcocat().size() > 0) {
+        if (!pelagictype.getSaByAcocat().isEmpty()) {
             freqType.getChType().add(pelagictype);
         }
-        if (bottomType.getSaByAcocat().size() > 0) {
+        if (!bottomType.getSaByAcocat().isEmpty()) {
             freqType.getChType().add(bottomType);
         }
     }

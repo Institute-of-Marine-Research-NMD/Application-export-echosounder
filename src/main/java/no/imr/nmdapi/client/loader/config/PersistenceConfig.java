@@ -18,6 +18,11 @@ public class PersistenceConfig {
     @Autowired
     private org.apache.commons.configuration.Configuration config;
 
+    /**
+     * Data source
+     *
+     * @return
+     */
     @Bean
     public DataSource dataSource() {
         BasicDataSource dataSource = new BasicDataSource();
@@ -31,9 +36,13 @@ public class PersistenceConfig {
         return dataSource;
     }
 
-    
+    /**
+     * Dao object for echosounder
+     *
+     * @return
+     */
     @Bean
-    public EchosounderDAO echosounderDAO(){
+    public EchosounderDAO echosounderDAO() {
         return new EchosounderDAO();
     }
 }

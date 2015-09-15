@@ -26,13 +26,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public class EchosounderDAO {
 
-    private JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public void setDataSource(DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
-
     private static final String GET_ECHOSOUNDER_DATASET = "select ed.id, ed.report_time, ed.lsss_version, cm.cruisecode, na.nationioc, pl.platform, mt.description, mi.startyear, mi.id as missionid "
             + "from nmdechosounder.echosounder_dataset ed, nmdmission.cruisemission cm, nmdreference.missiontype mt, "
             + "nmdmission.mission mi, nmdreference.platform pl, "
@@ -54,7 +47,7 @@ public class EchosounderDAO {
             + "where p.id_acoustic_category = a.id and "
             + "p.id_echosounder_dataset = ?";
 
-    private static final String platformCodesAfterStartQuery = " select platformcode , "
+    private static final String PLATFORM_CODES_AFTER_START_QUERY = " select platformcode , "
             + "pcs.platformcodesysname as platformcodesysname  "
             + "from nmdreference.platformcode pc,"
             + " nmdreference.platformcodesys pcs,"
@@ -65,6 +58,13 @@ public class EchosounderDAO {
             + " and m.start_time > pc.firstvaliddate  "
             + " order by   pc.firstvaliddate ";
 
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
     /**
      * Returns a list of acoustic categories
      *
@@ -74,28 +74,58 @@ public class EchosounderDAO {
         return jdbcTemplate.query(GET_ECHOSOUNDER_DATASET, new EchosounderDatasetMapper());
     }
 
+    /**
+     * Get a list of distances for the given echosounder dataset id
+     *
+     * @param id
+     * @return
+     */
     public List<Distance> getDistanceList(String id) {
         return jdbcTemplate.query(GET_DISTANCE_LIST_FOR_DATASET, new DistanceMapper(), id);
     }
 
+    /**
+     * Get a list of frequencies for the given dataset id
+     *
+     * @param id
+     * @return
+     */
     public List<Frequency> getFrequenciesList(String id) {
         return jdbcTemplate.query("select id, freq, tranceiver, threshold, num_pel_ch, num_bot_ch, min_bot_depth, max_bot_depth, upper_interpret_depth, lower_interpret_depth, upper_integrator_depth, lower_integrator_depth, quality, bubble_corr from nmdechosounder.frequency where id_distance = ?", new FrequencyMapper(), id);
     }
 
+    /**
+     * Get a list of sa for the given frequency id
+     *
+     * @param id
+     * @return
+     */
     public List<Sa> getSaForFrequency(String id) {
         return jdbcTemplate.query(GET_SA_FOR_FREQUENCY, new SaMapper(), id);
     }
 
+    /**
+     * Get a list of acoustic categories for the given dataset id
+     *
+     * @param datasetId
+     * @return
+     */
     public List<AcocatType> getAcousticCategory(String datasetId) {
         return jdbcTemplate.query(GET_ACOUSTIC_CATEGORY, new AcousticCategoryTypeMapper(), datasetId);
     }
 
+    /**
+     * Get a map of platform codes for the given mission
+     *
+     * @param missionID
+     * @return
+     */
     public Map<String, TypeValue> getCruisePlatformAfterStart(String missionID) {
         Map<String, TypeValue> result = new HashMap<String, TypeValue>();
 
-        List platformList = jdbcTemplate.query(platformCodesAfterStartQuery, new TypeValueMapper("platformcodesysname", "platformcode"), missionID);
+        List platformList = jdbcTemplate.query(PLATFORM_CODES_AFTER_START_QUERY, new TypeValueMapper("platformcodesysname", "platformcode"), missionID);
         for (Object platform : platformList) {
-            result.put(((TypeValue) platform).getType(), ((TypeValue) platform));
+            result.put(((TypeValue) platform).getType(), (TypeValue) platform);
         }
 
         return result;
