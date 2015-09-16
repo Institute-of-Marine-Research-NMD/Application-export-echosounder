@@ -3,16 +3,28 @@ package no.imr.nmdapi.client.loader.service;
 import java.io.File;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import no.imr.nmd.commons.dataset.jaxb.DatasetType;
+import no.imr.nmd.commons.dataset.jaxb.DatasetsType;
+import no.imr.nmd.commons.dataset.jaxb.QualityEnum;
+import no.imr.nmd.commons.dataset.jaxb.RestrictionsType;
 import no.imr.nmdapi.client.loader.dao.EchosounderDAO;
 import no.imr.nmdapi.client.loader.pojo.EchosounderDataset;
 import no.imr.nmdapi.client.loader.pojo.Frequency;
@@ -56,7 +68,6 @@ public class EchsounderLoaderService {
 
         List<EchosounderDataset> echosounderDatasets = dao.getEchosounderDatasets();
         for (EchosounderDataset echosounderDataset : echosounderDatasets) {
-
             EchosounderDatasetType datasetType = generateEchosounderDatasetType(echosounderDataset);
 
             PathGenerator pathGenerator = new PathGenerator();
@@ -64,6 +75,39 @@ public class EchsounderLoaderService {
             String platformPath = pathGenerator.createPlatformURICode(typevalues);
             File outputFile = pathGenerator.generatePath(config.getString("file.location"), echosounderDataset.getMissionType(), echosounderDataset.getStartYear(), platformPath, echosounderDataset.getCruisecode().toString(), "echosounder");
             writeToFile(datasetType, outputFile);
+            File datasetsFile = getDatasetsFile(outputFile);
+            DatasetsType datasets = null;
+            if (datasetsFile.exists()) {
+                datasets = unmarshall(datasetsFile);
+            } else {
+                datasets = new DatasetsType();
+            }
+            boolean found = false;
+            if (datasets != null) {
+                for (DatasetType dataset : datasets.getDataset()) {
+                    if (dataset.getDataType().equalsIgnoreCase("echosounder")) {
+                        found = true;
+                        dataset.setUpdated(getXMLGregorianCalendar(Calendar.getInstance().getTime()));
+                    }
+                }
+            }
+            if (!found) {
+                DatasetType dataset = new DatasetType();
+                dataset.setId("no:imr:echosounder:".concat(java.util.UUID.randomUUID().toString()));
+                dataset.setDataType("echosounder");
+                dataset.setDatasetName("data");
+                dataset.setOwner("imr");
+                RestrictionsType restrictionsType = new RestrictionsType();
+                restrictionsType.setRead("unrestricted");
+                restrictionsType.setWrite("SG-ECHOSOUNDER-WRITE");
+                dataset.setRestrictions(restrictionsType);
+                dataset.setQualityAssured(QualityEnum.NONE);
+                XMLGregorianCalendar cal = getXMLGregorianCalendar(Calendar.getInstance().getTime());
+                dataset.setUpdated(cal);
+                dataset.setCreated(cal);
+                datasets.getDataset().add(dataset);
+            }
+            marshall(datasetsFile, datasets);
             LOGGER.info("Wrote file: " + datasetType.getCruise().toString());
         }
         LOGGER.info("Finished");
@@ -244,6 +288,51 @@ public class EchsounderLoaderService {
             Marshaller marshaller = ctx.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             marshaller.marshal(taxaList, file);
+        } catch (JAXBException ex) {
+            Logger.getLogger(EchosounderDatasetType.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private XMLGregorianCalendar getXMLGregorianCalendar(Date date) {
+        try {
+            GregorianCalendar c = new GregorianCalendar();
+            c.setTime(Calendar.getInstance().getTime());
+            return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+        } catch (DatatypeConfigurationException ex) {
+            Logger.getLogger(EchsounderLoaderService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    private File getDatasetsFile(File outputFile) {
+        File dir = outputFile.getParentFile().getParentFile();
+        return new File(dir.getAbsolutePath().concat("/data.xml"));
+    }
+
+    private DatasetsType unmarshall(File datasetsFile) {
+        try {
+            JAXBContext ctx = JAXBContext.newInstance("no.imr.nmd.commons.dataset.jaxb");
+            Unmarshaller unm = ctx.createUnmarshaller();
+            Object o = unm.unmarshal(datasetsFile);
+            if (o != null) {
+                if (o instanceof JAXBElement) {
+                    return (DatasetsType) ((JAXBElement) o).getValue();
+                } else {
+                    return (DatasetsType) o;
+                }
+            }
+        } catch (JAXBException ex) {
+            Logger.getLogger(EchsounderLoaderService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    private void marshall(File datasetsFile, DatasetsType datasets) {
+        try {
+            JAXBContext ctx = JAXBContext.newInstance("no.imr.nmd.commons.dataset.jaxb");
+            Marshaller marshaller = ctx.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            marshaller.marshal(datasets, datasetsFile);
         } catch (JAXBException ex) {
             Logger.getLogger(EchosounderDatasetType.class.getName()).log(Level.SEVERE, null, ex);
         }

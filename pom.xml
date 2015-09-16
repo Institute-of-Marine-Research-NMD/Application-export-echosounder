@@ -19,15 +19,22 @@
         <repository>
             <id>nexus-release</id>
             <name>Nexus release repository for IMR</name>
-            <url>https://build.imr.no/nexus/content/repositories/releases</url>
+            <url>http://build.imr.no/nexus/content/repositories/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
-        <repository>
-            <id>repository.springsource.milestone</id>
-            <name>SpringSource Milestone Repository</name>
-            <url>http://repo.springsource.org/milestone</url>
-        </repository>
+
     </repositories>
     <dependencies>
+        <dependency>
+            <groupId>no.imr.nmd.commons.dataset.jaxb</groupId>
+            <artifactId>commons-dataset-jaxb</artifactId>
+            <version>1.0.5</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
@@ -314,7 +321,7 @@
             </build>
         </profile>
     </profiles>
-    
+
     <scm>
         <connection>scm:git:git@github.com:Institute-of-Marine-Research-NMD/Application-export-echosounder.git</connection>
         <url>scm:git:git@github.com:Institute-of-Marine-Research-NMD/Application-export-echosounder.git</url>
