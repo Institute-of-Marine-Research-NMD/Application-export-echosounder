@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +20,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import no.imr.nmd.commons.dataset.jaxb.DataTypeEnum;
 import no.imr.nmd.commons.dataset.jaxb.DatasetType;
 import no.imr.nmd.commons.dataset.jaxb.DatasetsType;
 import no.imr.nmd.commons.dataset.jaxb.QualityEnum;
@@ -76,7 +76,7 @@ public class EchsounderLoaderService {
             File outputFile = pathGenerator.generatePath(config.getString("file.location"), echosounderDataset.getMissionType(), echosounderDataset.getStartYear(), platformPath, echosounderDataset.getCruisecode().toString(), "echosounder");
             writeToFile(datasetType, outputFile);
             File datasetsFile = getDatasetsFile(outputFile);
-            DatasetsType datasets = null;
+            DatasetsType datasets;
             if (datasetsFile.exists()) {
                 datasets = unmarshall(datasetsFile);
             } else {
@@ -85,16 +85,16 @@ public class EchsounderLoaderService {
             boolean found = false;
             if (datasets != null) {
                 for (DatasetType dataset : datasets.getDataset()) {
-                    if (dataset.getDataType().equalsIgnoreCase("echosounder")) {
+                    if (dataset.getDataType().equals(DataTypeEnum.ECHOSOUNDER)) {
                         found = true;
-                        dataset.setUpdated(getXMLGregorianCalendar(Calendar.getInstance().getTime()));
+                        dataset.setUpdated(getXMLGregorianCalendar());
                     }
                 }
             }
             if (!found) {
                 DatasetType dataset = new DatasetType();
                 dataset.setId("no:imr:echosounder:".concat(java.util.UUID.randomUUID().toString()));
-                dataset.setDataType("echosounder");
+                dataset.setDataType(DataTypeEnum.ECHOSOUNDER);
                 dataset.setDatasetName("data");
                 dataset.setOwner("imr");
                 RestrictionsType restrictionsType = new RestrictionsType();
@@ -102,7 +102,7 @@ public class EchsounderLoaderService {
                 restrictionsType.setWrite("SG-ECHOSOUNDER-WRITE");
                 dataset.setRestrictions(restrictionsType);
                 dataset.setQualityAssured(QualityEnum.NONE);
-                XMLGregorianCalendar cal = getXMLGregorianCalendar(Calendar.getInstance().getTime());
+                XMLGregorianCalendar cal = getXMLGregorianCalendar();
                 dataset.setUpdated(cal);
                 dataset.setCreated(cal);
                 datasets.getDataset().add(dataset);
@@ -293,7 +293,7 @@ public class EchsounderLoaderService {
         }
     }
 
-    private XMLGregorianCalendar getXMLGregorianCalendar(Date date) {
+    private XMLGregorianCalendar getXMLGregorianCalendar() {
         try {
             GregorianCalendar c = new GregorianCalendar();
             c.setTime(Calendar.getInstance().getTime());
