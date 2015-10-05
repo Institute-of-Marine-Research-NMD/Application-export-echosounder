@@ -1,5 +1,6 @@
 package no.imr.nmdapi.client.loader.dao;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,4 +132,7 @@ public class EchosounderDAO {
         return result;
     }
 
+    public Date getLastUpdated(String datasetID) {
+        return jdbcTemplate.queryForObject("select last_updated from nmdechosounder.echosounder_dataset where id = ?", Date.class, datasetID);
+    }
 }

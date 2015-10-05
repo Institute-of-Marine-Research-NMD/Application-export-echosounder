@@ -4,6 +4,7 @@ import javax.sql.DataSource;
 import no.imr.nmdapi.client.loader.dao.EchosounderDAO;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 public class PersistenceConfig {
 
     @Autowired
+    @Qualifier("persistanceConfig")
     private org.apache.commons.configuration.Configuration config;
 
     /**

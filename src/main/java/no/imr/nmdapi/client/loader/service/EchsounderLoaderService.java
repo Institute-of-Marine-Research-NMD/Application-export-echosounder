@@ -1,6 +1,7 @@
 package no.imr.nmdapi.client.loader.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,10 +22,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import no.imr.nmd.commons.dataset.jaxb.DataTypeEnum;
-import no.imr.nmd.commons.dataset.jaxb.DatasetType;
 import no.imr.nmd.commons.dataset.jaxb.DatasetsType;
 import no.imr.nmd.commons.dataset.jaxb.QualityEnum;
-import no.imr.nmd.commons.dataset.jaxb.RestrictionsType;
 import no.imr.nmdapi.client.loader.dao.EchosounderDAO;
 import no.imr.nmdapi.client.loader.pojo.EchosounderDataset;
 import no.imr.nmdapi.client.loader.pojo.Frequency;
@@ -40,9 +39,12 @@ import no.imr.nmdapi.generic.nmdechosounder.domain.luf20.SaByAcocatType;
 import no.imr.nmdapi.generic.nmdechosounder.domain.luf20.SaType;
 import no.imr.nmdapi.lib.nmdapipathgenerator.PathGenerator;
 import no.imr.nmdapi.lib.nmdapipathgenerator.TypeValue;
+import org.apache.camel.Exchange;
 import org.apache.commons.configuration.Configuration;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -53,64 +55,42 @@ import org.springframework.stereotype.Service;
 @Service(value = "echosounderLoaderService")
 public class EchsounderLoaderService {
 
+    private static final String DATASET_CONTAINER_DELIMITER = "/";
+    
     @Autowired
     private EchosounderDAO dao;
 
     @Autowired
+    @Qualifier("configuration")
     private Configuration config;
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(EchsounderLoaderService.class);
 
     /**
      * Loads all echosounder datasets into xml files
+     *
+     * @param ex
      */
-    public void loadEchosounderToFile() {
+    public void loadEchosounderToFile(Exchange ex) {
+        EchosounderDataset echosounderDataset = ex.getIn().getBody(EchosounderDataset.class);
+        EchosounderDatasetType datasetType = generateEchosounderDatasetType(echosounderDataset);
 
-        List<EchosounderDataset> echosounderDatasets = dao.getEchosounderDatasets();
-        for (EchosounderDataset echosounderDataset : echosounderDatasets) {
-            EchosounderDatasetType datasetType = generateEchosounderDatasetType(echosounderDataset);
-
-            PathGenerator pathGenerator = new PathGenerator();
-            Map<String, TypeValue> typevalues = dao.getCruisePlatformAfterStart(echosounderDataset.getMissionId());
-            String platformPath = pathGenerator.createPlatformURICode(typevalues);
-            File outputFile = pathGenerator.generatePath(config.getString("file.location"), echosounderDataset.getMissionType(), echosounderDataset.getStartYear(), platformPath, echosounderDataset.getCruisecode().toString(), "echosounder");
-            writeToFile(datasetType, outputFile);
-            File datasetsFile = getDatasetsFile(outputFile);
-            DatasetsType datasets;
-            if (datasetsFile.exists()) {
-                datasets = unmarshall(datasetsFile);
-            } else {
-                datasets = new DatasetsType();
-            }
-            boolean found = false;
-            if (datasets != null) {
-                for (DatasetType dataset : datasets.getDataset()) {
-                    if (dataset.getDataType().equals(DataTypeEnum.ECHOSOUNDER)) {
-                        found = true;
-                        dataset.setUpdated(getXMLGregorianCalendar());
-                    }
-                }
-            }
-            if (!found) {
-                DatasetType dataset = new DatasetType();
-                dataset.setId("no:imr:echosounder:".concat(java.util.UUID.randomUUID().toString()));
-                dataset.setDataType(DataTypeEnum.ECHOSOUNDER);
-                dataset.setDatasetName("data");
-                dataset.setOwner("imr");
-                RestrictionsType restrictionsType = new RestrictionsType();
-                restrictionsType.setRead("unrestricted");
-                restrictionsType.setWrite("SG-ECHOSOUNDER-WRITE");
-                dataset.setRestrictions(restrictionsType);
-                dataset.setQualityAssured(QualityEnum.NONE);
-                XMLGregorianCalendar cal = getXMLGregorianCalendar();
-                dataset.setUpdated(cal);
-                dataset.setCreated(cal);
-                datasets.getDataset().add(dataset);
-            }
-            marshall(datasetsFile, datasets);
-            LOGGER.info("Wrote file: " + datasetType.getCruise().toString());
-        }
-        LOGGER.info("Finished");
+        PathGenerator pathGenerator = new PathGenerator();
+        Map<String, TypeValue> typevalues = dao.getCruisePlatformAfterStart(echosounderDataset.getMissionId());
+        String platformPath = pathGenerator.createPlatformURICode(typevalues);
+        File outputFile = pathGenerator.generatePath(config.getString("file.location"), echosounderDataset.getMissionType(),
+                echosounderDataset.getStartYear(), platformPath, echosounderDataset.getCruisecode().toString(), "echosounder");
+        writeToFile(datasetType, outputFile);
+        ex.getOut().setHeader("imr:datatype", DataTypeEnum.ECHOSOUNDER.toString());
+        ex.getOut().setHeader("imr:datasetname", "data");
+        ex.getOut().setHeader("imr:owner", "imr");
+        ex.getOut().setHeader("imr:read", "unrestricted");
+        ex.getOut().setHeader("imr:write", "SG-ECHOSOUNDER-WRITE");
+        ex.getOut().setHeader("imr:qualityassured", QualityEnum.NONE.toString());
+        ex.getOut().setHeader("imr:updated", getXMLGregorianCalendar().toString());
+        ex.getOut().setHeader("imr:datasetscontainer", echosounderDataset.getMissionType().concat(DATASET_CONTAINER_DELIMITER).concat(echosounderDataset.getStartYear()).
+                concat(DATASET_CONTAINER_DELIMITER).concat(platformPath).concat(DATASET_CONTAINER_DELIMITER).concat(echosounderDataset.getCruisecode().toString()));
+        LOGGER.info("Wrote file: " + datasetType.getCruise().toString());
     }
 
     private EchosounderDatasetType generateEchosounderDatasetType(EchosounderDataset echosounderDataset) {
@@ -282,12 +262,36 @@ public class EchsounderLoaderService {
         });
     }
 
-    private void writeToFile(Object taxaList, File file) {
+    private void writeToFile(EchosounderDatasetType dataset, File path) {
+        File newFile = new File(FileUtils.getTempDirectory().getAbsolutePath().concat(File.separator).concat(dataset.getCruise().toString()));
+        File oldFile = new File(path.getAbsolutePath());
+
+        writeLUF20File(dataset, newFile);
+        if (newFile.exists() && oldFile.exists()) {
+            try {
+                if (FileUtils.checksumCRC32(oldFile) != FileUtils.checksumCRC32(newFile)) {
+                    FileUtils.copyFile(newFile, oldFile);
+                }
+            } catch (IOException ex) {
+                LOGGER.error("Error working on table ".concat(dataset.getCruise().toString()), ex);
+            }
+        } else if (newFile.exists() && !oldFile.exists()) {
+            try {
+                FileUtils.copyFile(newFile, oldFile);
+            } catch (IOException ex) {
+                LOGGER.error("Unable to write file " + oldFile.getAbsolutePath(), ex);
+            }
+        }
+        newFile.delete();
+        LOGGER.info("FINISHED with ".concat(dataset.getCruise().toString()));
+    }
+
+    private void writeLUF20File(EchosounderDatasetType dataset, File path) {
         try {
             JAXBContext ctx = JAXBContext.newInstance("no.imr.nmdapi.generic.nmdechosounder.domain.luf20");
             Marshaller marshaller = ctx.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.marshal(taxaList, file);
+            marshaller.marshal(dataset, path);
         } catch (JAXBException ex) {
             Logger.getLogger(EchosounderDatasetType.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -1,6 +1,7 @@
 package no.imr.nmdapi.client.loader.config;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.apache.commons.configuration.reloading.ReloadingStrategy;
 import org.springframework.context.annotation.Bean;
@@ -14,15 +15,17 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ApplicationConfig {
 
+    private static final String CATALINA_BASE = "catalina.base";
+
     /**
      * Configuration object for communicating with property data.
      *
      * @return Configuration object containg properties.
      * @throws ConfigurationException Error during instansiation.
      */
-    @Bean
-    public org.apache.commons.configuration.Configuration configuration() throws ConfigurationException {
-        org.apache.commons.configuration.PropertiesConfiguration configuration = new org.apache.commons.configuration.PropertiesConfiguration(System.getProperty("catalina.base") + "/conf/nmd_echosounder_loader.properties");
+    @Bean(name = "configuration")
+    public PropertiesConfiguration configuration() throws ConfigurationException {
+        PropertiesConfiguration configuration = new PropertiesConfiguration(System.getProperty(CATALINA_BASE) + "/conf/nmd_echosounder_loader.properties");
         ReloadingStrategy reloadingStrategy = new FileChangedReloadingStrategy();
         configuration.setReloadingStrategy(reloadingStrategy);
         return configuration;
