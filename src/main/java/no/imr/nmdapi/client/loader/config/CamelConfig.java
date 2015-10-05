@@ -1,6 +1,7 @@
 package no.imr.nmdapi.client.loader.config;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.routepolicy.quartz.CronScheduledRoutePolicy;
 import org.apache.camel.spring.javaconfig.SingleRouteCamelConfiguration;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +18,17 @@ public class CamelConfig extends SingleRouteCamelConfiguration implements Initia
 
     @Autowired
     @Qualifier("configuration")
-    private  org.apache.commons.configuration.Configuration config;
-    
+    private org.apache.commons.configuration.Configuration config;
+
     @Override
     public RouteBuilder route() {
         return new RouteBuilder() {
 
             @Override
             public void configure() {
-                from("timer://harvesttimer?fixedRate=true&period=86400000")
+                CronScheduledRoutePolicy startPolicy = new CronScheduledRoutePolicy();
+                startPolicy.setRouteStartTime(config.getString("cron.activation.time"));
+                from("direct:start").routePolicy(startPolicy).noAutoStartup()
                         .to("getAllEchosounderDatasets")
                         .split(body())
                         .to("echosounderLoaderService")
