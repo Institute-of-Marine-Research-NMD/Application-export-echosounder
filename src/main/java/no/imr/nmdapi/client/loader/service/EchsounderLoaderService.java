@@ -87,6 +87,7 @@ public class EchsounderLoaderService {
         ex.getOut().setHeader("imr:write", "SG-ECHOSOUNDER-WRITE");
         ex.getOut().setHeader("imr:qualityassured", QualityEnum.NONE.toString());
         ex.getOut().setHeader("imr:updated", getXMLGregorianCalendar().toString());
+        ex.getOut().setHeader("imr:description", "");
         ex.getOut().setHeader("imr:datasetscontainer", echosounderDataset.getMissionType().concat(DATASET_CONTAINER_DELIMITER).concat(echosounderDataset.getStartYear()).
                 concat(DATASET_CONTAINER_DELIMITER).concat(platformPath).concat(DATASET_CONTAINER_DELIMITER).concat(echosounderDataset.getCruisecode().toString()));
         LOGGER.info("Wrote file: " + datasetType.getCruise().toString());
