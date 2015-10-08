@@ -4,7 +4,7 @@
 
     <groupId>no.imr.nmdapi.client.apps</groupId>
     <artifactId>echosounderLoader</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.6-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Application - NMDEchosounder loader</name>
 
@@ -179,6 +179,10 @@
                         <endorseddirs>${endorsed.dir}</endorseddirs>
                     </compilerArguments>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
