@@ -4,7 +4,7 @@
 
     <groupId>no.imr.nmdapi.client.apps</groupId>
     <artifactId>echosounderLoader</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.5-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Application - NMDEchosounder loader</name>
 
@@ -364,6 +364,10 @@
             <id>nexus-releases</id>
             <url>https://build.imr.no/nexus/content/repositories/releases</url>
         </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>https://build.imr.no/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
 </project>
 
