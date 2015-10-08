@@ -13,4 +13,6 @@ file.configuration.activemq=activemq.properties
 queue.outgoing.error=error  
 queue.outgoing.update-dataset=update-dataset  
 
-cron.activation.time=* 2 * * *
+cron.activation.time=* 2 * * * ?  
+
+application.name=Application - NMDEchosounder loader
