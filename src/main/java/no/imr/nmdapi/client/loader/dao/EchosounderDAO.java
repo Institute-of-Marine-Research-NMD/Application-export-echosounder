@@ -36,6 +36,16 @@ public class EchosounderDAO {
             + "and mi.id_r_platform = pl.id and pl.id_nation = na.id "
             + "and mi.id_r_missiontype = mt.id";
 
+    private static final String GET_ECHOSOUNDER_DATASET_BY_ID = "select ed.id, ed.report_time, ed.lsss_version, cm.cruisecode, na.nationioc, pl.platform, mt.description, mi.startyear, mi.id as missionid "
+            + "from nmdechosounder.echosounder_dataset ed, nmdmission.cruisemission cm, nmdreference.missiontype mt, "
+            + "nmdmission.mission mi, nmdreference.platform pl, "
+            + "nmdreference.nation na "
+            + "Where "
+            + "ed.id_m_mission = mi.id and cm.id_mission = mi.id "
+            + "and mi.id_r_platform = pl.id and pl.id_nation = na.id "
+            + "and mi.id_r_missiontype = mt.id"
+            + " and ed.id = ?";
+
     private static final String GET_DISTANCE_LIST_FOR_DATASET = "select id, bot_ch_thickness, include_estimate, integrator_dist, lat_start, lat_stop, lon_start, lon_stop, pel_ch_thickness, start_time, stop_time, log_start "
             + "from nmdechosounder.distance where id_echosounder_dataset = ? order by start_time";
 
@@ -134,5 +144,9 @@ public class EchosounderDAO {
 
     public Date getLastUpdated(String datasetID) {
         return jdbcTemplate.queryForObject("select last_updated from nmdechosounder.echosounder_dataset where id = ?", Date.class, datasetID);
+    }
+
+    public EchosounderDataset getEchosounderDatasetById(String echosounderDatasetID) {
+        return jdbcTemplate.queryForObject(GET_ECHOSOUNDER_DATASET_BY_ID, new EchosounderDatasetMapper(), echosounderDatasetID);
     }
 }

@@ -1,5 +1,7 @@
 package no.imr.nmdapi.client.loader.config;
 
+import no.imr.messaging.processor.ExceptionProcessor;
+import no.imr.nmdapi.exceptions.CantWriteFileException;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.routepolicy.quartz.CronScheduledRoutePolicy;
 import org.apache.camel.spring.javaconfig.SingleRouteCamelConfiguration;
@@ -28,7 +30,9 @@ public class CamelConfig extends SingleRouteCamelConfiguration implements Initia
             public void configure() {
                 CronScheduledRoutePolicy startPolicy = new CronScheduledRoutePolicy();
                 startPolicy.setRouteStartTime(config.getString("cron.activation.time"));
-                from("direct:start").routePolicy(startPolicy).noAutoStartup()
+
+                onException(CantWriteFileException.class).continued(true).process(new ExceptionProcessor(config.getString("application.name"))).to("jms:queue:".concat(config.getString("queue.outgoing.error")));
+                from("timer://runOnce?repeatCount=1&delay=5000").routePolicy(startPolicy)//.noAutoStartup()
                         .to("getAllEchosounderDatasets")
                         .split(body())
                         .to("echosounderLoaderService")

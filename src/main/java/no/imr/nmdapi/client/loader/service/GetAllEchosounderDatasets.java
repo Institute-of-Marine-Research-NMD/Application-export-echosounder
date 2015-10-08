@@ -39,10 +39,9 @@ public class GetAllEchosounderDatasets {
     @Qualifier("configuration")
     private Configuration config;
 
-    public List<EchosounderDataset> getDatasets() {
+    public List<String> getDatasets() {
 
-        PathGenerator pathgen = new PathGenerator();
-        List<EchosounderDataset> updatedEchosounderDatasets = new ArrayList<>();
+        List<String> updatedEchosounderDatasets = new ArrayList<>();
         List<EchosounderDataset> allEchosounderDatasets = dao.getEchosounderDatasets();
         for (EchosounderDataset echosounderDataset : allEchosounderDatasets) {
             PathGenerator pathGenerator = new PathGenerator();
@@ -58,7 +57,7 @@ public class GetAllEchosounderDatasets {
                 for (DatasetType datasetType : dataset.getDataset()) {
                     if (datasetType.getDataType().equals(DataTypeEnum.ECHOSOUNDER) && lastUpdated.after(datasetType.getUpdated().toGregorianCalendar().getTime())) {
                         LOGGER.info("found dataset, time on dataset: " + datasetType.getUpdated().toString() + "  time on db: " + lastUpdated.toString());
-                        updatedEchosounderDatasets.add(echosounderDataset);
+                        updatedEchosounderDatasets.add(echosounderDataset.getId());
                         found = true;
                     } else if (datasetType.getDataType().equals(DataTypeEnum.ECHOSOUNDER) && !lastUpdated.after(datasetType.getUpdated().toGregorianCalendar().getTime())) {
                         found = true;
@@ -66,10 +65,10 @@ public class GetAllEchosounderDatasets {
                 }
 
                 if (!found) {
-                    updatedEchosounderDatasets.add(echosounderDataset);
+                    updatedEchosounderDatasets.add(echosounderDataset.getId());
                 }
             } else {
-                updatedEchosounderDatasets.add(echosounderDataset);
+                updatedEchosounderDatasets.add(echosounderDataset.getId());
             }
         }
         return updatedEchosounderDatasets;

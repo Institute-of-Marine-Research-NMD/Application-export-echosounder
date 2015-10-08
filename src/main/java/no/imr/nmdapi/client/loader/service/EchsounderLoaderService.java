@@ -14,20 +14,18 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import no.imr.nmd.commons.dataset.jaxb.DataTypeEnum;
-import no.imr.nmd.commons.dataset.jaxb.DatasetsType;
 import no.imr.nmd.commons.dataset.jaxb.QualityEnum;
 import no.imr.nmdapi.client.loader.dao.EchosounderDAO;
 import no.imr.nmdapi.client.loader.pojo.EchosounderDataset;
 import no.imr.nmdapi.client.loader.pojo.Frequency;
 import no.imr.nmdapi.client.loader.pojo.Sa;
+import no.imr.nmdapi.exceptions.CantWriteFileException;
 import no.imr.nmdapi.generic.nmdechosounder.domain.luf20.AcocatListType;
 import no.imr.nmdapi.generic.nmdechosounder.domain.luf20.AcocatType;
 import no.imr.nmdapi.generic.nmdechosounder.domain.luf20.ChTypeType;
@@ -56,7 +54,7 @@ import org.springframework.stereotype.Service;
 public class EchsounderLoaderService {
 
     private static final String DATASET_CONTAINER_DELIMITER = "/";
-    
+
     @Autowired
     private EchosounderDAO dao;
 
@@ -72,7 +70,8 @@ public class EchsounderLoaderService {
      * @param ex
      */
     public void loadEchosounderToFile(Exchange ex) {
-        EchosounderDataset echosounderDataset = ex.getIn().getBody(EchosounderDataset.class);
+        String echosounderDatasetID = ex.getIn().getBody(String.class);
+        EchosounderDataset echosounderDataset = dao.getEchosounderDatasetById(echosounderDatasetID);
         EchosounderDatasetType datasetType = generateEchosounderDatasetType(echosounderDataset);
 
         PathGenerator pathGenerator = new PathGenerator();
@@ -274,12 +273,14 @@ public class EchsounderLoaderService {
                 }
             } catch (IOException ex) {
                 LOGGER.error("Error working on table ".concat(dataset.getCruise().toString()), ex);
+                throw new CantWriteFileException("Unable to write echosounder file", oldFile, ex);
             }
         } else if (newFile.exists() && !oldFile.exists()) {
             try {
                 FileUtils.copyFile(newFile, oldFile);
             } catch (IOException ex) {
                 LOGGER.error("Unable to write file " + oldFile.getAbsolutePath(), ex);
+                throw new CantWriteFileException("Unable to write echosounder file", oldFile, ex);
             }
         }
         newFile.delete();
@@ -294,6 +295,7 @@ public class EchsounderLoaderService {
             marshaller.marshal(dataset, path);
         } catch (JAXBException ex) {
             Logger.getLogger(EchosounderDatasetType.class.getName()).log(Level.SEVERE, null, ex);
+            throw new CantWriteFileException("Unable to marshall file for echosounder dataset", path, ex);
         }
     }
 
@@ -306,39 +308,5 @@ public class EchsounderLoaderService {
             Logger.getLogger(EchsounderLoaderService.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
-    }
-
-    private File getDatasetsFile(File outputFile) {
-        File dir = outputFile.getParentFile().getParentFile();
-        return new File(dir.getAbsolutePath().concat("/data.xml"));
-    }
-
-    private DatasetsType unmarshall(File datasetsFile) {
-        try {
-            JAXBContext ctx = JAXBContext.newInstance("no.imr.nmd.commons.dataset.jaxb");
-            Unmarshaller unm = ctx.createUnmarshaller();
-            Object o = unm.unmarshal(datasetsFile);
-            if (o != null) {
-                if (o instanceof JAXBElement) {
-                    return (DatasetsType) ((JAXBElement) o).getValue();
-                } else {
-                    return (DatasetsType) o;
-                }
-            }
-        } catch (JAXBException ex) {
-            Logger.getLogger(EchsounderLoaderService.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
-    }
-
-    private void marshall(File datasetsFile, DatasetsType datasets) {
-        try {
-            JAXBContext ctx = JAXBContext.newInstance("no.imr.nmd.commons.dataset.jaxb");
-            Marshaller marshaller = ctx.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.marshal(datasets, datasetsFile);
-        } catch (JAXBException ex) {
-            Logger.getLogger(EchosounderDatasetType.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 }

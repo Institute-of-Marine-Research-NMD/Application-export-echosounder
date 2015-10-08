@@ -153,6 +153,16 @@
             <artifactId>activemq-pool</artifactId>
             <version>${activemq.version}</version>
         </dependency>
+        <dependency>
+            <groupId>no.imr.nmdapi.common</groupId>
+            <artifactId>nmdapi-exceptions</artifactId>
+            <version>0.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>no.imr.nmd.messaging.processor</groupId>
+            <artifactId>commons-message-processor</artifactId>
+            <version>1.0.0</version>
+        </dependency>
     </dependencies>
 
     <build>
