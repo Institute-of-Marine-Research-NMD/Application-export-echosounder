@@ -11,9 +11,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -61,6 +58,9 @@ public class EchsounderLoaderService {
     @Autowired
     @Qualifier("configuration")
     private Configuration config;
+
+    @Autowired
+    private Marshaller marshaller;
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(EchsounderLoaderService.class);
 
@@ -265,39 +265,19 @@ public class EchsounderLoaderService {
     private void writeToFile(EchosounderDatasetType dataset, File path) {
         File newFile = new File(FileUtils.getTempDirectory().getAbsolutePath().concat(File.separator).concat(dataset.getCruise().toString()));
         File oldFile = new File(path.getAbsolutePath());
-
-        writeLUF20File(dataset, newFile);
-        if (newFile.exists() && oldFile.exists()) {
-            try {
-                if (FileUtils.checksumCRC32(oldFile) != FileUtils.checksumCRC32(newFile)) {
-                    FileUtils.copyFile(newFile, oldFile);
-                }
-            } catch (IOException ex) {
-                LOGGER.error("Error working on table ".concat(dataset.getCruise().toString()), ex);
-                throw new CantWriteFileException("Unable to write echosounder file", oldFile, ex);
-            }
-        } else if (newFile.exists() && !oldFile.exists()) {
-            try {
-                FileUtils.copyFile(newFile, oldFile);
-            } catch (IOException ex) {
-                LOGGER.error("Unable to write file " + oldFile.getAbsolutePath(), ex);
-                throw new CantWriteFileException("Unable to write echosounder file", oldFile, ex);
-            }
-        }
-        newFile.delete();
-        LOGGER.info("FINISHED with ".concat(dataset.getCruise().toString()));
-    }
-
-    private void writeLUF20File(EchosounderDatasetType dataset, File path) {
         try {
-            JAXBContext ctx = JAXBContext.newInstance("no.imr.nmdapi.generic.nmdechosounder.domain.luf20");
-            Marshaller marshaller = ctx.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.marshal(dataset, path);
+            marshaller.marshal(dataset, newFile);
+            FileUtils.copyFile(newFile, oldFile);
+        } catch (IOException ex) {
+            LOGGER.error("Unable to copy echosounder file ".concat(dataset.getCruise().toString()), ex);
+            throw new CantWriteFileException("Unable to copy echosounder file", oldFile, ex);
         } catch (JAXBException ex) {
-            Logger.getLogger(EchosounderDatasetType.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Unable to marshall file for echosounder dataset", ex);
             throw new CantWriteFileException("Unable to marshall file for echosounder dataset", path, ex);
         }
+
+        newFile.delete();
+        LOGGER.info("FINISHED with ".concat(dataset.getCruise().toString()));
     }
 
     private XMLGregorianCalendar getXMLGregorianCalendar() {
@@ -306,7 +286,7 @@ public class EchsounderLoaderService {
             c.setTime(Calendar.getInstance().getTime());
             return DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         } catch (DatatypeConfigurationException ex) {
-            Logger.getLogger(EchsounderLoaderService.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error("Unable to create xml gregorian calendar", ex);
         }
         return null;
     }

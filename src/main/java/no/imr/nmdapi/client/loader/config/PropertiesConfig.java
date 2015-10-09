@@ -1,5 +1,8 @@
 package no.imr.nmdapi.client.loader.config;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import no.imr.nmdapi.dao.file.NMDDatasetDao;
 import no.imr.nmdapi.dao.file.NMDDatasetDaoImpl;
 import org.apache.commons.configuration.ConfigurationException;
@@ -48,9 +51,17 @@ public class PropertiesConfig {
         conf.setReloadingStrategy(new FileChangedReloadingStrategy());
         return conf;
     }
-    
+
     @Bean
-    public NMDDatasetDao getNMDDatasetDao(){
+    public NMDDatasetDao getNMDDatasetDao() {
         return new NMDDatasetDaoImpl();
+    }
+
+    @Bean
+    public Marshaller getMarshaller() throws JAXBException {
+        JAXBContext ctx = JAXBContext.newInstance("no.imr.nmdapi.generic.nmdechosounder.domain.luf20");
+        Marshaller marshaller = ctx.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        return marshaller;
     }
 }
