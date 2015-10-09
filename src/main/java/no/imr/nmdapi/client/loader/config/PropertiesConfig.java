@@ -53,11 +53,6 @@ public class PropertiesConfig {
     }
 
     @Bean
-    public NMDDatasetDao getNMDDatasetDao() {
-        return new NMDDatasetDaoImpl();
-    }
-
-    @Bean
     public Marshaller getMarshaller() throws JAXBException {
         JAXBContext ctx = JAXBContext.newInstance("no.imr.nmdapi.generic.nmdechosounder.domain.luf20");
         Marshaller marshaller = ctx.createMarshaller();
