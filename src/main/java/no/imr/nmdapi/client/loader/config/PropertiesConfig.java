@@ -1,5 +1,7 @@
 package no.imr.nmdapi.client.loader.config;
 
+import no.imr.nmdapi.dao.file.NMDDatasetDao;
+import no.imr.nmdapi.dao.file.NMDDatasetDaoImpl;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
@@ -45,5 +47,10 @@ public class PropertiesConfig {
         PropertiesConfiguration conf = new PropertiesConfiguration(System.getProperty(CATALINA_BASE) + "/conf/" + configuration.getString("file.configuration.activemq"));
         conf.setReloadingStrategy(new FileChangedReloadingStrategy());
         return conf;
+    }
+    
+    @Bean
+    public NMDDatasetDao getNMDDatasetDao(){
+        return new NMDDatasetDaoImpl();
     }
 }
