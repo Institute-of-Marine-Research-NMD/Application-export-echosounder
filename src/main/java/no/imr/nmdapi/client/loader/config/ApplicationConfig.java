@@ -25,7 +25,7 @@ public class ApplicationConfig {
      */
     @Bean(name = "configuration")
     public PropertiesConfiguration configuration() throws ConfigurationException {
-        PropertiesConfiguration configuration = new PropertiesConfiguration(System.getProperty(CATALINA_BASE) + "/conf/nmd_echosounder_loader.properties");
+        PropertiesConfiguration configuration = new PropertiesConfiguration(System.getProperty(CATALINA_BASE) + "/conf/export_echosounder_loader.properties");
         ReloadingStrategy reloadingStrategy = new FileChangedReloadingStrategy();
         configuration.setReloadingStrategy(reloadingStrategy);
         return configuration;
