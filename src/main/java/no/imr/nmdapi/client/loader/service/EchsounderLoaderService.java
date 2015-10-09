@@ -75,7 +75,7 @@ public class EchsounderLoaderService {
         EchosounderDatasetType datasetType = generateEchosounderDatasetType(echosounderDataset);
 
         PathGenerator pathGenerator = new PathGenerator();
-        Map<String, TypeValue> typevalues = dao.getCruisePlatformAfterStart(echosounderDataset.getMissionId());
+        Map<String, TypeValue> typevalues = dao.getCruisePlatform(echosounderDataset.getMissionId());
         String platformPath = pathGenerator.createPlatformURICode(typevalues);
         File outputFile = pathGenerator.generatePath(config.getString("file.location"), echosounderDataset.getMissionType(),
                 echosounderDataset.getStartYear(), platformPath, echosounderDataset.getCruisecode().toString(), "echosounder");

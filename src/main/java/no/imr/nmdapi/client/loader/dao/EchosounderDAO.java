@@ -131,9 +131,13 @@ public class EchosounderDAO {
      * @param missionID
      * @return
      */
-    public Map<String, TypeValue> getCruisePlatformAfterStart(String missionID) {
+    public Map<String, TypeValue> getCruisePlatform(String missionID) {
         Map<String, TypeValue> result = new HashMap<String, TypeValue>();
 
+        //The query will return all platform codes that were valid before mission start.
+        //Since we are ordering by firstvaliddate the last platform code of each type found wil be
+        // the valid one at mission start. 
+        //Using a hash map so previous values will be discarded and only last added (for eacg type) will be kept
         List platformList = jdbcTemplate.query(PLATFORM_CODES_AFTER_START_QUERY, new TypeValueMapper("platformcodesysname", "platformcode"), missionID);
         for (Object platform : platformList) {
             result.put(((TypeValue) platform).getType(), (TypeValue) platform);
