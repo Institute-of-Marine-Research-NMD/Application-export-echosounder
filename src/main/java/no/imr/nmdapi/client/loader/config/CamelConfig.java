@@ -32,11 +32,13 @@ public class CamelConfig extends SingleRouteCamelConfiguration implements Initia
                 startPolicy.setRouteStartTime(config.getString("cron.activation.time"));
 
                 onException(CantWriteFileException.class).continued(true).process(new ExceptionProcessor(config.getString("application.name"))).to("jms:queue:".concat(config.getString("queue.outgoing.error")));
-                from("timer://runOnce?repeatCount=1&delay=5000").routePolicy(startPolicy)//.noAutoStartup()
+                from("timer://runOnce?repeatCount=1&delay=5000").routePolicy(startPolicy)
                         .to("getAllEchosounderDatasets")
                         .split(body())
                         .to("echosounderLoaderService")
-                        .to("jms:queue:".concat(config.getString("queue.outgoing.update-dataset")));
+                        .multicast()
+                        .to("jms:queue:".concat(config.getString("queue.outgoing.update-dataset")),
+                                "jms:queue:".concat(config.getString("queue.outgoing.success")));
             }
         };
     }
