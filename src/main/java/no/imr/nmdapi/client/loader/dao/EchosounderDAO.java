@@ -147,7 +147,7 @@ public class EchosounderDAO {
     }
 
     public Date getLastUpdated(String datasetID) {
-        return jdbcTemplate.queryForObject("select last_updated from nmdechosounder.echosounder_dataset where id = ?", Date.class, datasetID);
+        return jdbcTemplate.queryForObject("select last_edited from nmdechosounder.echosounder_dataset where id = ?", Date.class, datasetID);
     }
 
     public EchosounderDataset getEchosounderDatasetById(String echosounderDatasetID) {
