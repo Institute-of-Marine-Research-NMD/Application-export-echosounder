@@ -31,7 +31,7 @@ public class GetAllEchosounderDatasets {
     private NMDDatasetDao datasetDAO;
 
     public List<String> getDatasets() {
-
+        LOGGER.info("Started checking echosounder datasets");
         List<String> updatedEchosounderDatasets = new ArrayList<>();
         List<EchosounderDataset> allEchosounderDatasets = dao.getEchosounderDatasets();
         for (EchosounderDataset echosounderDataset : allEchosounderDatasets) {

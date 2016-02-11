@@ -30,7 +30,9 @@ public class CamelConfig extends SingleRouteCamelConfiguration implements Initia
             public void configure() {
 
                 onException(CantWriteFileException.class).continued(true).process(new ExceptionProcessor(config.getString("application.name"))).to("jms:queue:".concat(config.getString("queue.outgoing.error")));
-                from("quartz://cacheRefresh?cron="+UnsafeUriCharactersEncoder.encode(config.getString("cron.activation.time")))
+
+                from("quartz://cacheRefresh?cron=" + UnsafeUriCharactersEncoder.encode(config.getString("cron.activation.time")))
+                        .from("timer://runOnce?repeatCount=1&delay=5000")
                         .to("getAllEchosounderDatasets")
                         .split(body())
                         .to("echosounderLoaderService")
