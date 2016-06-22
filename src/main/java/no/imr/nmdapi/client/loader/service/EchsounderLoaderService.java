@@ -72,6 +72,8 @@ public class EchsounderLoaderService {
     public void loadEchosounderToFile(Exchange ex) {
         String echosounderDatasetID = ex.getIn().getBody(String.class);
         EchosounderDataset echosounderDataset = dao.getEchosounderDatasetById(echosounderDatasetID);
+        LOGGER.info("Started: " + echosounderDataset.getStartYear() + " " + echosounderDataset.getMissionType());
+
         EchosounderDatasetType datasetType = generateEchosounderDatasetType(echosounderDataset);
 
         PathGenerator pathGenerator = new PathGenerator();
@@ -164,7 +166,7 @@ public class EchsounderLoaderService {
             freqType.setUpperInterpretDepth(frequency.getUpperInterpretDepth());
 
             generateSA(frequency, freqType);
-            dist.setFrequency(freqType);
+            dist.getFrequency().add(freqType);
         }
     }
 
@@ -235,12 +237,10 @@ public class EchsounderLoaderService {
                     return 1;
                 } else if (o1Val < o2Val) {
                     return -1;
-                } else {
-                    if (o1.getAcocat().intValue() > o2.getAcocat().intValue()) {
-                        return 1;
-                    } else if (o1.getAcocat().intValue() < o2.getAcocat().intValue()) {
-                        return -1;
-                    }
+                } else if (o1.getAcocat().intValue() > o2.getAcocat().intValue()) {
+                    return 1;
+                } else if (o1.getAcocat().intValue() < o2.getAcocat().intValue()) {
+                    return -1;
                 }
                 return 0;
             }
