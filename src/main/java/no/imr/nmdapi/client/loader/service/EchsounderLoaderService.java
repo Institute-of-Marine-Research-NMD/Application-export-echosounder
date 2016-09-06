@@ -128,13 +128,13 @@ public class EchsounderLoaderService {
             Distance dist = new Distance();
             dist.setBotChThickness(distance.getBotChThickness());
             dist.setIncludeEstimate(distance.getIncludeEstimate());
-            dist.setIntegratorDist(distance.getIntegratorDist());
-            dist.setLatStart(distance.getLatStart());
+            dist.setIntegratorDist(distance.getIntegratorDist().doubleValue());
+            dist.setLatStart(distance.getLatStart().doubleValue());
             dist.setLatStop(distance.getLatStop());
-            dist.setLogStart(distance.getLogStart());
-            dist.setLonStart(distance.getLonStart());
+            dist.setLogStart(distance.getLogStart().doubleValue());
+            dist.setLonStart(distance.getLonStart().doubleValue());
             dist.setLonStop(distance.getLonStop());
-            dist.setPelChThickness(distance.getPelChThickness());
+            dist.setPelChThickness(distance.getPelChThickness().doubleValue());
             dist.setStartTime(distance.getStartTime());
             dist.setStopTime(distance.getStopTime());
 
@@ -149,22 +149,22 @@ public class EchsounderLoaderService {
         List<Frequency> frequencies = dao.getFrequenciesList(distance.getId());
         for (Frequency frequency : frequencies) {
             FrequencyType freqType = new FrequencyType();
-            freqType.setBubbleCorr(frequency.getBubbleCorr());
+            freqType.setBubbleCorr(frequency.getBubbleCorr().doubleValue());
             freqType.setFreq(frequency.getFreq());
-            freqType.setLowerIntegratorDepth(frequency.getLowerIntegratorDepth());
-            freqType.setLowerInterpretDepth(frequency.getLowerInterpretDepth());
-            freqType.setMaxBotDepth(frequency.getMaxBotDepth());
-            freqType.setMinBotDepth(frequency.getMinBotDepth());
+            freqType.setLowerIntegratorDepth(frequency.getLowerIntegratorDepth().doubleValue());
+            freqType.setLowerInterpretDepth(frequency.getLowerInterpretDepth().doubleValue());
+            freqType.setMaxBotDepth(frequency.getMaxBotDepth().doubleValue());
+            freqType.setMinBotDepth(frequency.getMinBotDepth().doubleValue());
             freqType.setNumBotCh(frequency.getNumBotCh());
             freqType.setNumPelCh(frequency.getNumPelCh());
             freqType.setQuality(frequency.getQuality());
-            freqType.setThreshold(frequency.getThreshold());
+            freqType.setThreshold(frequency.getThreshold().doubleValue());
             freqType.setTranceiver(frequency.getTranceiver());
-            freqType.setUpperIntegratorDepth(frequency.getUpperIntegratorDepth());
-            freqType.setUpperInterpretDepth(frequency.getUpperInterpretDepth());
+            freqType.setUpperIntegratorDepth(frequency.getUpperIntegratorDepth().doubleValue());
+            freqType.setUpperInterpretDepth(frequency.getUpperInterpretDepth().doubleValue());
 
             generateSA(frequency, freqType);
-            dist.setFrequency(freqType);
+            dist.getFrequency().add(freqType);
         }
     }
 
@@ -206,7 +206,7 @@ public class EchsounderLoaderService {
             for (Sa sabyaco : sabyacos) {
                 SaType satype = new SaType();
                 satype.setCh(sabyaco.getCh());
-                satype.setValue(sabyaco.getSa());
+                satype.setValue(sabyaco.getSa().doubleValue());
                 if ("B".equals(sabyaco.getChType())) {
                     acousticcateogoryBottom.getSa().add(satype);
                 } else if ("P".equals(sabyaco.getChType())) {
