@@ -1,5 +1,6 @@
 package no.imr.nmdapi.client.loader.config;
 
+import java.util.ArrayList;
 import no.imr.messaging.processor.ExceptionProcessor;
 import no.imr.nmdapi.exceptions.CantWriteFileException;
 import org.apache.camel.builder.RouteBuilder;
@@ -34,7 +35,8 @@ public class CamelConfig extends SingleRouteCamelConfiguration implements Initia
                 from("quartz://cacheRefresh?cron=" + UnsafeUriCharactersEncoder.encode(config.getString("cron.activation.time")))
                         .from("timer://runOnce?repeatCount=1&delay=5000")
                         .to("getAllEchosounderDatasets")
-                        .split(body())
+                        .split(body(ArrayList.class))
+                        .parallelProcessing()
                         .to("echosounderLoaderService")
                         .multicast()
                         .to("jms:queue:".concat(config.getString("queue.outgoing.update-dataset")),
