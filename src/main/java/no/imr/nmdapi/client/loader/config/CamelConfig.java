@@ -36,7 +36,7 @@ public class CamelConfig extends SingleRouteCamelConfiguration implements Initia
                         .from("timer://runOnce?repeatCount=1&delay=5000")
                         .to("getAllEchosounderDatasets")
                         .split(body(ArrayList.class))
-                        .parallelProcessing()
+//                        .parallelProcessing()
                         .to("echosounderLoaderService")
                         .multicast()
                         .to("jms:queue:".concat(config.getString("queue.outgoing.update-dataset")),
