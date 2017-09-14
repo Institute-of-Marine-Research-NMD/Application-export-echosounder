@@ -4,7 +4,7 @@
 
     <groupId>no.imr.nmdapi.client.apps</groupId>
     <artifactId>echosounderLoader</artifactId>
-    <version>1.0.15</version>
+    <version>1.0.16-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Application - NMDEchosounder loader</name>
 
@@ -366,7 +366,7 @@
         <connection>scm:git:git@github.com:Institute-of-Marine-Research-NMD/Application-export-echosounder.git</connection>
         <url>scm:git:git@github.com:Institute-of-Marine-Research-NMD/Application-export-echosounder.git</url>
         <developerConnection>scm:git:git@github.com:Institute-of-Marine-Research-NMD/Application-export-echosounder.git</developerConnection>
-        <tag>echosounderLoader-1.0.15</tag>
+        <tag>HEAD</tag>
     </scm>
     <distributionManagement>
         <repository>
