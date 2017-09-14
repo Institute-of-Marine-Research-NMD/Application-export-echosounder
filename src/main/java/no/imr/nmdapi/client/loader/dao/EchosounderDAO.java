@@ -67,6 +67,7 @@ public class EchosounderDAO {
             + " and  pc.id_platform = m.id_r_platform"
             + " and m.id = ? "
             + " and m.start_time > pc.firstvaliddate  "
+            + " and m.start_time < pc.lastvaliddate "
             + " order by   pc.firstvaliddate ";
 
     private JdbcTemplate jdbcTemplate;
