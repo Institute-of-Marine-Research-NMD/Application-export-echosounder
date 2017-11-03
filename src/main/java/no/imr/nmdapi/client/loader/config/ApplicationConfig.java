@@ -1,5 +1,7 @@
 package no.imr.nmdapi.client.loader.config;
 
+import no.imr.nmdapi.client.loader.route.GenerateAll;
+import no.imr.nmdapi.client.loader.route.GenerateUpdated;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
@@ -29,5 +31,15 @@ public class ApplicationConfig {
         ReloadingStrategy reloadingStrategy = new FileChangedReloadingStrategy();
         configuration.setReloadingStrategy(reloadingStrategy);
         return configuration;
+    }
+
+    @Bean
+    public GenerateAll generateAllRoute() {
+        return new GenerateAll();
+    }
+
+    @Bean
+    public GenerateUpdated generateUpdatedRoute() {
+        return new GenerateUpdated();
     }
 }

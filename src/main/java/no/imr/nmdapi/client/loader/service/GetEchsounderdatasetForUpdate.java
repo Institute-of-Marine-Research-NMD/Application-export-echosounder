@@ -19,10 +19,10 @@ import org.springframework.stereotype.Service;
  *
  * @author sjurl
  */
-@Service("getAllEchosounderDatasets")
-public class GetAllEchosounderDatasets {
+@Service("getEchsounderdatasetForUpdate")
+public class GetEchsounderdatasetForUpdate {
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GetAllEchosounderDatasets.class);
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(GetEchsounderdatasetForUpdate.class);
 
     @Autowired
     private EchosounderDAO dao;
@@ -49,6 +49,7 @@ public class GetAllEchosounderDatasets {
                 updatedEchosounderDatasets.add(echosounderDataset.getId());
             }
         }
+        LOGGER.info("Done checking all datasets");
         return updatedEchosounderDatasets;
     }
 }

@@ -1,14 +1,13 @@
 package no.imr.nmdapi.client.loader.config;
 
 import java.util.ArrayList;
-import no.imr.messaging.processor.ExceptionProcessor;
-import no.imr.nmdapi.exceptions.CantWriteFileException;
+import java.util.List;
+import no.imr.nmdapi.client.loader.route.GenerateAll;
+import no.imr.nmdapi.client.loader.route.GenerateUpdated;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.spring.javaconfig.SingleRouteCamelConfiguration;
-import org.apache.camel.util.UnsafeUriCharactersEncoder;
+import org.apache.camel.spring.javaconfig.CamelConfiguration;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -17,37 +16,25 @@ import org.springframework.context.annotation.Configuration;
  * @author sjurl
  */
 @Configuration
-public class CamelConfig extends SingleRouteCamelConfiguration implements InitializingBean {
+public class CamelConfig extends CamelConfiguration implements InitializingBean {
 
     @Autowired
-    @Qualifier("configuration")
-    private org.apache.commons.configuration.Configuration config;
+    private GenerateAll generateAllRoute;
+
+    @Autowired
+    private GenerateUpdated generateUpdatedRoute;
 
     @Override
-    public RouteBuilder route() {
-        return new RouteBuilder() {
-
-            @Override
-            public void configure() {
-
-                onException(CantWriteFileException.class).continued(true).process(new ExceptionProcessor(config.getString("application.name"))).to("jms:queue:".concat(config.getString("queue.outgoing.error")));
-
-                from("quartz://cacheRefresh?cron=" + UnsafeUriCharactersEncoder.encode(config.getString("cron.activation.time")))
-                        .from("timer://runOnce?repeatCount=1&delay=5000")
-                        .to("getAllEchosounderDatasets")
-                        .split(body(ArrayList.class))
-//                        .parallelProcessing()
-                        .to("echosounderLoaderService")
-                        .multicast()
-                        .to("jms:queue:".concat(config.getString("queue.outgoing.update-dataset")),
-                                "jms:queue:".concat(config.getString("queue.outgoing.success")));
-            }
-        };
+    public List<RouteBuilder> routes() {
+        List<RouteBuilder> routes = new ArrayList<>();
+        routes.add(generateAllRoute);
+        routes.add(generateUpdatedRoute);
+        return routes;
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        // Do nothing as we don't set any properties
+        // no properties loaded so not used
     }
 
 }

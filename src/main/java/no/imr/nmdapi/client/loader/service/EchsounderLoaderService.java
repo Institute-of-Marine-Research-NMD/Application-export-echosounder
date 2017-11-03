@@ -71,6 +71,7 @@ public class EchsounderLoaderService {
      */
     public void loadEchosounderToFile(Exchange ex) {
         String echosounderDatasetID = ex.getIn().getBody(String.class);
+        LOGGER.info(echosounderDatasetID);
         EchosounderDataset echosounderDataset = dao.getEchosounderDatasetById(echosounderDatasetID);
         LOGGER.info("Started: " + echosounderDataset.getStartYear() + " " + echosounderDataset.getMissionType());
 
@@ -161,7 +162,7 @@ public class EchsounderLoaderService {
             freqType.setNumPelCh(frequency.getNumPelCh());
             freqType.setQuality(frequency.getQuality());
             freqType.setThreshold(frequency.getThreshold().doubleValue());
-            freqType.setTranceiver(frequency.getTranceiver());
+            freqType.setTransceiver(frequency.getTranceiver());
             freqType.setUpperIntegratorDepth(frequency.getUpperIntegratorDepth().doubleValue());
             freqType.setUpperInterpretDepth(frequency.getUpperInterpretDepth().doubleValue());
 
