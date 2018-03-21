@@ -24,7 +24,7 @@ public class EchosounderDatasetMapper implements RowMapper<EchosounderDataset> {
         type.setId(rs.getString("id"));
         type.setCruisecode(rs.getString("cruisecode"));
         type.setLsssVersion(rs.getString("lsss_version"));
-        type.setNationioc(BigInteger.valueOf(rs.getInt("nationioc")));
+        type.setNationioc(rs.getString("nationioc"));
         type.setPlatform(BigInteger.valueOf(rs.getInt("platform")));
         type.setMissionType(rs.getString("description"));
         type.setStartYear(String.valueOf(rs.getInt("startyear")));

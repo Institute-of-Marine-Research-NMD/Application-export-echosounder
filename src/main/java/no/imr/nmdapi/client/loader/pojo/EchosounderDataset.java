@@ -11,7 +11,7 @@ public class EchosounderDataset {
     private String id;
     private String cruisecode;
     private String lsssVersion;
-    private BigInteger nationioc;
+    private String nationioc;
     private BigInteger platform;
     private String reportTime;
     private String startYear;
@@ -63,14 +63,14 @@ public class EchosounderDataset {
     /**
      * @return the nationioc
      */
-    public BigInteger getNationioc() {
+    public String getNationioc() {
         return nationioc;
     }
 
     /**
      * @param nationioc the nationioc to set
      */
-    public void setNationioc(BigInteger nationioc) {
+    public void setNationioc(String nationioc) {
         this.nationioc = nationioc;
     }
 
