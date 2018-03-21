@@ -9,7 +9,7 @@ import java.math.BigInteger;
 public class EchosounderDataset {
 
     private String id;
-    private BigInteger cruisecode;
+    private String cruisecode;
     private String lsssVersion;
     private BigInteger nationioc;
     private BigInteger platform;
@@ -35,14 +35,14 @@ public class EchosounderDataset {
     /**
      * @return the cruisecode
      */
-    public BigInteger getCruisecode() {
+    public String getCruisecode() {
         return cruisecode;
     }
 
     /**
      * @param cruisecode the cruisecode to set
      */
-    public void setCruisecode(BigInteger cruisecode) {
+    public void setCruisecode(String cruisecode) {
         this.cruisecode = cruisecode;
     }
 

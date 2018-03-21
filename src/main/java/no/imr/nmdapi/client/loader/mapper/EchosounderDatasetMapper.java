@@ -22,7 +22,7 @@ public class EchosounderDatasetMapper implements RowMapper<EchosounderDataset> {
     public EchosounderDataset mapRow(ResultSet rs, int rowNum) throws SQLException {
         EchosounderDataset type = new EchosounderDataset();
         type.setId(rs.getString("id"));
-        type.setCruisecode(BigInteger.valueOf(Long.valueOf(rs.getString("cruisecode"))));
+        type.setCruisecode(rs.getString("cruisecode"));
         type.setLsssVersion(rs.getString("lsss_version"));
         type.setNationioc(BigInteger.valueOf(rs.getInt("nationioc")));
         type.setPlatform(BigInteger.valueOf(rs.getInt("platform")));
